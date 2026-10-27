@@ -1,48 +1,62 @@
 import { useState } from 'react';
 import {
     Card, CardBody, CardTitle, Form, FormGroup, Label, Input,
-    Button, Alert, ListGroup, ListGroupItem, Badge
+    Button, Alert, ListGroup, ListGroupItem, Badge, Spinner
 } from 'reactstrap';
 
 const ReactorPage = () => {
     // ESTADOS (useState) requeridos por el docente
-    const [temperatura, setTemperatura] = useState(""); // Input numérico
-    const [historial, setHistorial] = useState([]); // Arreglo con temperaturas fallidas
-    const [mensajeAdvertencia, setMensajeAdvertencia] = useState(""); // Mensaje del servidor/sistema
-    const [estabilizado, setEstabilizado] = useState(false); // Booleano (ganó o no)
+    const [temperatura, setTemperatura] = useState("");
+    const [historial, setHistorial] = useState([]);
+    const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
+    const [estabilizado, setEstabilizado] = useState(false);
+    const [cargando, setCargando] = useState(false); // Estado extra para evitar spam de clics
 
-    // Función que se ejecuta al enviar el formulario
-    const manejarEnvio = (e) => {
-        e.preventDefault(); // Evita recargar la página
+    // Función asíncrona para manejar el envío a la API
+    const manejarEnvio = async (e) => {
+        e.preventDefault();
 
-        // Validar que sea un número
         const valorNumerico = Number(temperatura);
         if (temperatura === "" || isNaN(valorNumerico)) {
             setMensajeAdvertencia("Por favor, ingresa un número válido.");
             return;
         }
 
-        // --- LÓGICA DEL JUEGO (Lógica de Negocio) ---
-        // Supongamos que el reactor explota si la temperatura es menor a 0 o mayor a 100.
-        // El objetivo es que el usuario ingrese exactamente 50 para estabilizarlo.
+        setCargando(true);
+        setMensajeAdvertencia(""); // Limpia mensajes previos
 
-        if (valorNumerico === 50) {
-            setEstabilizado(true);
-            setMensajeAdvertencia("¡Felicidades! Has estabilizado el reactor.");
-        } else {
-            // Si falla, guardamos el intento en el historial
-            setHistorial([...historial, valorNumerico]);
+        try {
+            // Se utiliza la variable de entorno configurada previamente
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+            
+            // Petición al backend usando fetch (promesas)
+            const respuesta = await fetch(`${baseUrl}/adjust`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ temperaturaCliente: valorNumerico })
+            });
 
-            // Damos pistas al usuario
-            if (valorNumerico < 50) {
-                setMensajeAdvertencia("¡Peligro! Temperatura muy baja. El reactor se está congelando.");
-            } else {
-                setMensajeAdvertencia("¡Peligro! Temperatura muy alta. ¡El reactor va a explotar!");
+            if (!respuesta.ok) {
+                throw new Error("Error en la respuesta del servidor");
             }
-        }
 
-        // Limpiamos el input
-        setTemperatura("");
+            const datos = await respuesta.json();
+
+            // Actualización de estados basados en la respuesta real del backend
+            setEstabilizado(datos.estabilizado);
+            setMensajeAdvertencia(datos.mensaje);
+
+            if (!datos.exito) {
+                setHistorial([...historial, valorNumerico]);
+            }
+
+        } catch (error) {
+            // Captura de errores de red (ej. backend apagado o sin CORS)
+            setMensajeAdvertencia("Error de conexión: El servidor no responde o está apagado.");
+        } finally {
+            setCargando(false);
+            setTemperatura("");
+        }
     };
 
     return (
@@ -69,7 +83,7 @@ const ReactorPage = () => {
                                 id="tempInput"
                                 value={temperatura}
                                 onChange={(e) => setTemperatura(e.target.value)}
-                                disabled={estabilizado} // Bloquea el input si ya ganó
+                                disabled={estabilizado || cargando} // Bloquea si ya ganó o está cargando
                                 placeholder="Ingresa un valor..."
                             />
                         </FormGroup>
@@ -77,9 +91,9 @@ const ReactorPage = () => {
                             color="warning"
                             type="submit"
                             block
-                            disabled={estabilizado}
+                            disabled={estabilizado || cargando}
                         >
-                            {estabilizado ? "Reactor Estable" : "Enviar Ajuste"}
+                            {cargando ? <Spinner size="sm" /> : (estabilizado ? "Reactor Estable" : "Enviar Ajuste")}
                         </Button>
                     </Form>
 
@@ -99,7 +113,6 @@ const ReactorPage = () => {
                             ))}
                         </ListGroup>
                     )}
-
                 </CardBody>
             </Card>
         </div>

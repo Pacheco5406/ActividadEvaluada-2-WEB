@@ -35,12 +35,26 @@ const compararTemperatura = (req, res) => {
     //esto solo es para asegurar q si este cumpliendose reinicios y todo
     console.log(temperaturaComparativa)
 
-    if(temperaturaComparativa === temperaturaClienteNumerico){
-         return res.json({mensaje: "Reactor estabilizado"});
-    } else if (temperaturaComparativa > temperaturaClienteNumerico){
-        return res.json({mensaje:"La temperatura es mayor para estabilizar"})
-    } else {
-         return res.json({mensaje:"La temperatura es menor para estabilizar"})
+    if (temperaturaComparativa === temperaturaClienteNumerico) {
+         // GANA: exito y estabilizado son true
+         return res.json({ 
+             mensaje: "Reactor estabilizado", 
+             exito: true, 
+             estabilizado: true 
+         });
+    } else if (temperaturaComparativa > temperaturaClienteNumerico) {
+        // FALLA (muy baja): exito y estabilizado son false
+        return res.json({ 
+            mensaje: "La temperatura es mayor para estabilizar", 
+            exito: false, 
+            estabilizado: false 
+        }); 
+    }else {
+         return res.json({ 
+             mensaje: "La temperatura es menor para estabilizar", 
+             exito: false, 
+             estabilizado: false
+            })
     };
 
 };
