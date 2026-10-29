@@ -1,12 +1,15 @@
 const { calcularTotal } = require('../utils/calcularTotal');
 const { nuevaPartida, acaboTiempo, conseguirPartidaActual } = require('../utils/partida')
 const { evaluarVictoria } = require('../utils/victoriaEspacial');
+const { calcularPeso } = require('../utils/calcularPeso');
 //Declaramos una constante como la partida de la sesion actual
 const partida = conseguirPartidaActual();
 //Para no repetir el mensaje de partida finalizada
 const mensajeTiempo = { sesionExpirada: true, error: "Se acabo el tiempo, puedes iniciar una nueva sesión" };
 const mensajeConfirmada = { error: "La carga ya fue confirmada, inicia una nueva sesión para jugar otra vez" };
 
+//Limite de peso
+const limitePeso = 100;
 
 //GET Api donde recuperamos los datos de inventario al azar
 const getInventario = (req, res) => {
@@ -25,7 +28,9 @@ const getCarga = (req, res) => {
   res.json({
     creditos: partida.creditosDisponibles,
     itemsCargados: partida.cargaActual,
-    total: calcularTotal(partida)
+    total: calcularTotal(partida),
+    peso: calcularPeso(partida),
+    limitePeso
   });
 };
 
@@ -55,6 +60,9 @@ const postCargaTemporal = (req, res) => {
   if (calcularTotal(partida) + itemInventarioCarga.precio * cantidad > partida.creditosDisponibles) {
     return res.status(400).json({ error: "Créditos insuficientes para esta cantidad" });
   }
+    if (calcularPeso(partida) + itemInventarioCarga.peso * cantidad > limitePeso) {
+    return res.status(400).json({ error: `Peso máximo excedido, la nave solo soporta ${limitePeso} kg` });
+  }
 
   itemInventarioCarga.stock -= cantidad;
   const enCarga = partida.cargaActual.find(i => i.id === equipoId);
@@ -68,7 +76,8 @@ const postCargaTemporal = (req, res) => {
     mensaje: "Suministro agregado a la carga",
     creditos: partida.creditosDisponibles,
     itemsCargados: partida.cargaActual,
-    total: calcularTotal(partida)
+    total: calcularTotal(partida),
+    peso:calcularPeso(partida)
   });
 }
 
@@ -102,6 +111,9 @@ const putEditarCarga = (req, res) => {
   if (nuevoTotal > partida.creditosDisponibles) {
     return res.status(400).json({ error: "Créditos insuficientes para esta cantidad" });
   }
+    if (calcularPeso(partida) + producto.peso * diferencia > limitePeso) {
+    return res.status(400).json({ error: `Peso máximo excedido, la nave solo soporta ${limitePeso} kg` });
+  }
 
   producto.stock -= diferencia;
   enCarga.cantidad = nuevaCantidad;
@@ -110,7 +122,9 @@ const putEditarCarga = (req, res) => {
     mensaje: "Unidades actualizadas",
     creditos: partida.creditosDisponibles,
     itemsCargados: partida.cargaActual,
-    total: calcularTotal(partida)
+    total: calcularTotal(partida),
+    peso: calcularPeso(partida),
+    limitePeso
   });
 }
 
@@ -137,7 +151,9 @@ const deleteCarga = (req, res) => {
     mensaje: "Suministro eliminado correctamente de la carga",
     creditos: partida.creditosDisponibles,
     itemsCargados: partida.cargaActual,
-    total: calcularTotal(partida)
+    total: calcularTotal(partida),
+    peso:calcularPeso(partida),
+    limitePeso
   });
 };
 
@@ -167,7 +183,7 @@ const postConfirmarCarga = (req, res) => {
   //El ? actua como un if abreviado 
   const motivo = resultado.creditosRestantes <= 0
     ? "Gastaste todo tu presupuesto, debía quedarte saldo. Perdiste"
-    : `Gastaste el ${resultado.porcentajeGastado}% y debías gastar mínimo 70%. Perdiste`;
+    : `Gastaste el ${resultado.porcentajeGastado}% y debías gastar mínimo 30%. Perdiste`;
   return res.status(200).json({ mensaje: motivo, ...resultado });
 
 };

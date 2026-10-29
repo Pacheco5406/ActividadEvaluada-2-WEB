@@ -9,6 +9,8 @@ const CargaPage = () => {
     const [cargaActual, setCargaActual] = useState([]);
     const [creditos, setCreditos] = useState(0.00);
     const [costoTotal, setCostoTotal] = useState(0.00);
+    const [pesoTotal, setPesoTotal] = useState(0);
+    const [limitePeso, setLimitePeso] = useState(100);
     const [cargando, setCargando] = useState(true);
     const [mensajeError, setMensajeError] = useState("");
     const [mensajeVictoria, setMensajeVictoria] = useState("");
@@ -37,6 +39,8 @@ const CargaPage = () => {
             setCargaActual(dataCarga.itemsCargados || []);
             setCreditos(dataCarga.creditos);
             setCostoTotal(dataCarga.total);
+            setPesoTotal(dataCarga.peso || 0);
+            setLimitePeso(dataCarga.limitePeso || 100);
 
             if (dataTiempo) {
                 setTiempoRestante(Math.floor(dataTiempo.tiempoRestanteMs / 1000));
@@ -204,7 +208,7 @@ const CargaPage = () => {
                         <h4 className="mb-0 fw-bold">🚀 AstroLogistics Ltd.</h4>
                         <small className="text-muted">Panel del Capitán - Ventana de Lanzamiento</small>
                         <div className="mt-1 small text-danger fw-bold">
-                            ⚠️ Regla: Debes gastar mínimo el 70% de los créditos (sin llegar a 0).
+                            ⚠️ Regla: Debes gastar mínimo el 30% de los créditos (sin llegar a 0).
                         </div>
                     </div>
 
@@ -214,6 +218,9 @@ const CargaPage = () => {
                         </Badge>
                         <Badge color="dark" pill className="p-2 px-3 fs-6 shadow-sm">
                             📦 Costo Total: {costoTotal.toFixed(2)} Cr
+                        </Badge>
+                        <Badge color={pesoTotal >= limitePeso ? "danger" : "info"} pill className="p-2 px-3 fs-6 shadow-sm">
+                            ⚖️ Peso: {pesoTotal.toFixed(2)} / {limitePeso} kg
                         </Badge>
                         <Badge color={tiempoRestante <= 10 ? "danger" : "warning"} pill className="p-2 px-3 fs-6 shadow-sm text-dark">
                             ⏱️ {tiempoRestante} s
@@ -245,6 +252,7 @@ const CargaPage = () => {
                                         <CardBody className="d-flex flex-column">
                                             <CardTitle tag="h6" className="mb-1 fw-bold">{item.nombre}</CardTitle>
                                             <CardText className="text-muted small mb-2">{item.categoria}</CardText>
+                                            <CardText className="small mb-2">⚖️ {item.peso} kg c/u</CardText>
                                             <div className="d-flex justify-content-between align-items-center mb-3 mt-auto">
                                                 <Badge color="success" className="fs-6">${item.precio}</Badge>
                                                 <span className="small fw-bold text-muted">Stock: {item.stock}</span>
@@ -284,7 +292,7 @@ const CargaPage = () => {
                                         <ListGroupItem key={itemCargado.id} className="d-flex justify-content-between align-items-center py-3">
                                             <div>
                                                 <strong>{itemBase.nombre || `Item #${itemCargado.id}`}</strong><br />
-                                                <small className="text-muted">${itemBase.precio || 0} c/u</small>
+                                                <small className="text-muted">${itemBase.precio || 0} c/u · {itemBase.peso || 0} kg c/u</small>
                                             </div>
                                             <div className="text-end">
                                                 <ButtonGroup size="sm" className="mb-2">

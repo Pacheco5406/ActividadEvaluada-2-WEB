@@ -1,7 +1,7 @@
 //Como regla decidida la persona debe gastar 70% de su presupuesto sin llegar a 0
 const { calcularTotal } = require('./calcularTotal');
 
-const porcentajeMeta = 70;
+const porcentajeMeta = 30;
 
 function evaluarVictoria(partida) {
   const total = calcularTotal(partida);
