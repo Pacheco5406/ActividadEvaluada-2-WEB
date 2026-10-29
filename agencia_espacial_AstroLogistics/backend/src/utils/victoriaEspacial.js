@@ -7,7 +7,7 @@ function evaluarVictoria(partida) {
   const total = calcularTotal(partida);
   const presupuesto = partida.presupuestoInicial;
   const cumpleMinimo = total * 100 >= presupuesto * porcentajeMeta;
-  const quedaSaldo = total < presupuesto;          
+  const quedaSaldo = total < presupuesto;
 
   return {
     gano: cumpleMinimo && quedaSaldo,
@@ -18,4 +18,4 @@ function evaluarVictoria(partida) {
   };
 }
 
-module.exports = {evaluarVictoria};
+module.exports = { evaluarVictoria };

@@ -1,6 +1,6 @@
 //Aqui dejamos la parte de nuevas partidas
-const {listaInventario, presupuestoCapitan} = require('../data/dataAstro');
-const {relojTemporal, compararTiempoAcabado} = require('../utils/temporizador');
+const { listaInventario, presupuestoCapitan } = require('../data/dataAstro');
+const { relojTemporal, compararTiempoAcabado } = require('../utils/temporizador');
 
 
 //creamos la base de las partidas
@@ -13,7 +13,7 @@ let partidaDelMomento = {
     tiempoParaAcabar: 0
 };
 
-function nuevaPartida () {
+function nuevaPartida() {
     //Primero elegimos un inventario y presupuesto al azar usando math.randon
     const inventarioPartida = Math.floor(Math.random() * listaInventario.length);
     const presupuestoPartida = Math.floor(Math.random() * presupuestoCapitan.length);
@@ -32,7 +32,7 @@ function nuevaPartida () {
 };
 
 //Funcion para luego comparar si el tiempo acabo en los API
-function acaboTiempo (){
+function acaboTiempo() {
     if (partidaDelMomento.confirmada) {
         return false;
     }
@@ -40,7 +40,7 @@ function acaboTiempo (){
 };
 
 //Funcion que envia la partida 
-function conseguirPartidaActual(){
+function conseguirPartidaActual() {
     return partidaDelMomento;
 }
 

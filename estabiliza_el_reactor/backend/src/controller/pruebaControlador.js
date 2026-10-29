@@ -15,7 +15,7 @@ const compararTemperatura = (req, res) => {
     const { temperaturaCliente } = req.body;
 
     if (
-        temperaturaCliente === undefined
+        temperaturaCliente === undefined || temperaturaCliente === null
     ) {
         return res.status(400).json(
             { error: "Completa el campo de temperatura" }
@@ -29,6 +29,10 @@ const compararTemperatura = (req, res) => {
     }
 
     const temperaturaClienteNumerico = Number(temperaturaCliente);
+
+    if (isNaN(temperaturaClienteNumerico)) {
+        return res.status(400).json({ error: "Ingresa un numero valido" });
+    }
 
     let temperaturaComparativa = temperatura.verTemperaturaActual();
 
