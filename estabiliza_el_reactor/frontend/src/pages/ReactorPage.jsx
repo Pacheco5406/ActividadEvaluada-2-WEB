@@ -5,14 +5,14 @@ import {
 } from 'reactstrap';
 
 const ReactorPage = () => {
-    // ESTADOS (useState) requeridos por el docente
+    // ESTADOS (useState)
     const [temperatura, setTemperatura] = useState("");
     const [historial, setHistorial] = useState([]);
     const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
     const [estabilizado, setEstabilizado] = useState(false);
-    const [cargando, setCargando] = useState(false); // Estado extra para evitar spam de clics
+    const [cargando, setCargando] = useState(false);
 
-    // Función asíncrona para manejar el envío a la API
+    // Función para manejar el envío del intento
     const manejarEnvio = async (e) => {
         e.preventDefault();
 
@@ -23,13 +23,11 @@ const ReactorPage = () => {
         }
 
         setCargando(true);
-        setMensajeAdvertencia(""); // Limpia mensajes previos
+        setMensajeAdvertencia("");
 
         try {
-            // Se utiliza la variable de entorno configurada previamente
             const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            
-            // Petición al backend usando fetch (promesas)
+
             const respuesta = await fetch(`${baseUrl}/adjust`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -42,7 +40,6 @@ const ReactorPage = () => {
 
             const datos = await respuesta.json();
 
-            // Actualización de estados basados en la respuesta real del backend
             setEstabilizado(datos.estabilizado);
             setMensajeAdvertencia(datos.mensaje);
 
@@ -51,11 +48,36 @@ const ReactorPage = () => {
             }
 
         } catch (error) {
-            // Captura de errores de red (ej. backend apagado o sin CORS)
             setMensajeAdvertencia("Error de conexión: El servidor no responde o está apagado.");
         } finally {
             setCargando(false);
             setTemperatura("");
+        }
+    };
+
+    // --- NUEVA FUNCIÓN: REINICIAR SISTEMA ---
+    const reiniciarSistema = async () => {
+        setCargando(true);
+        try {
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+            // Llamamos al backend para que genere una nueva temperatura secreta
+            const respuesta = await fetch(`${baseUrl}/reboot`, {
+                method: 'POST', // o GET, dependiendo de cómo lo haya hecho tu compañero
+            });
+
+            if (!respuesta.ok) throw new Error("Error al reiniciar");
+
+            // Limpiamos todos los estados visuales
+            setHistorial([]);
+            setEstabilizado(false);
+            setTemperatura("");
+            setMensajeAdvertencia("Sistema reiniciado. ¡Nueva temperatura generada!");
+
+        } catch (error) {
+            setMensajeAdvertencia("Error de conexión al intentar reiniciar el sistema.");
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -74,7 +96,6 @@ const ReactorPage = () => {
                         </Alert>
                     )}
 
-                    {/* Formulario con input numérico y botón */}
                     <Form onSubmit={manejarEnvio}>
                         <FormGroup>
                             <Label for="tempInput">Intento de ajuste de temperatura (°C):</Label>
@@ -83,7 +104,7 @@ const ReactorPage = () => {
                                 id="tempInput"
                                 value={temperatura}
                                 onChange={(e) => setTemperatura(e.target.value)}
-                                disabled={estabilizado || cargando} // Bloquea si ya ganó o está cargando
+                                disabled={estabilizado || cargando}
                                 placeholder="Ingresa un valor..."
                             />
                         </FormGroup>
@@ -99,7 +120,6 @@ const ReactorPage = () => {
 
                     <hr className="my-4" />
 
-                    {/* Lista dinámica con el historial */}
                     <h5>Registro de Temperaturas Fallidas:</h5>
                     {historial.length === 0 ? (
                         <p className="text-muted">No hay intentos fallidos aún. ¡Sigue intentando!</p>
@@ -113,6 +133,21 @@ const ReactorPage = () => {
                             ))}
                         </ListGroup>
                     )}
+
+                    {/* --- BOTÓN DE REINICIO --- */}
+                    {/* Solo se muestra si el jugador ya ganó (estabilizó el reactor) */}
+                    {estabilizado && (
+                        <Button
+                            color="primary"
+                            block
+                            className="mt-4"
+                            onClick={reiniciarSistema}
+                            disabled={cargando}
+                        >
+                            {cargando ? <Spinner size="sm" /> : "🔄 Jugar de Nuevo (Reiniciar)"}
+                        </Button>
+                    )}
+
                 </CardBody>
             </Card>
         </div>
