@@ -1,5 +1,5 @@
 //Generador de numeros aleatorios hasta el 100
-function generadorTemperaturaEstabilizadora (){
+function generadorTemperaturaEstabilizadora() {
     return Math.floor(Math.random() * 101);
 }
 
@@ -7,12 +7,12 @@ function generadorTemperaturaEstabilizadora (){
 let NumeroFijo = generadorTemperaturaEstabilizadora();
 
 //Para ver cual es el numero actual
-function verTemperaturaActual(){
+function verTemperaturaActual() {
     return NumeroFijo;
 }
 
 //Para cuando reiniciemos el servidor
-function rebootServerNumero(){
+function rebootServerNumero() {
     NumeroFijo = generadorTemperaturaEstabilizadora();
     return NumeroFijo;
 }

@@ -8,7 +8,7 @@ const listaInventario = [
     { id: 204, nombre: "Jeringas 10ml (Paquete)", precio: 30.00, stock: 20, categoria: "Insumos" },
     { id: 205, nombre: "Kit de Reparación de Casco", precio: 300.00, stock: 2, categoria: "Mecánica" }
   ],
-  
+
   [
     { id: 206, nombre: "Raciones de Comida Espacial", precio: 50.00, stock: 10, categoria: "Supervivencia" },
     { id: 207, nombre: "Batería de Respaldo Elemento Zero", precio: 200.00, stock: 3, categoria: "Energía" },
@@ -34,6 +34,6 @@ const listaInventario = [
 
 
 module.exports = {
-    listaInventario,
-    presupuestoCapitan
+  listaInventario,
+  presupuestoCapitan
 }

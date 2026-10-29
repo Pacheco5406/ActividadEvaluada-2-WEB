@@ -2,7 +2,7 @@
 //para limite de juego
 //Date.now da en milisegundos
 
-function relojTemporal(){
+function relojTemporal() {
 
     const tiempoJuego = 240000;
     return Date.now() + tiempoJuego;
@@ -10,11 +10,11 @@ function relojTemporal(){
 
 //Funcion de comparacion
 
-function compararTiempoAcabado(tiempoAcabado){
+function compararTiempoAcabado(tiempoAcabado) {
     return Date.now() > tiempoAcabado;
 }
 
-module.exports ={
+module.exports = {
     relojTemporal,
     compararTiempoAcabado
 }
