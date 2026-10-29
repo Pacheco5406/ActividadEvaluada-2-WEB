@@ -5,7 +5,6 @@ import {
 } from 'reactstrap';
 
 const ReactorPage = () => {
-    // ESTADOS (useState)
     const [temperatura, setTemperatura] = useState("");
     const [historial, setHistorial] = useState([]);
     const [mensajeAdvertencia, setMensajeAdvertencia] = useState("");
@@ -55,24 +54,30 @@ const ReactorPage = () => {
         }
     };
 
-    // --- NUEVA FUNCIÓN: REINICIAR SISTEMA ---
+    // FUNCIÓN: REINICIAR SISTEMA 
     const reiniciarSistema = async () => {
         setCargando(true);
         try {
             const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-            // Llamamos al backend para que genere una nueva temperatura secreta
+            
             const respuesta = await fetch(`${baseUrl}/reboot`, {
-                method: 'POST', // o GET, dependiendo de cómo lo haya hecho tu compañero
+                method: 'POST',
             });
 
-            if (!respuesta.ok) throw new Error("Error al reiniciar");
+            const datos = await respuesta.json();
 
-            // Limpiamos todos los estados visuales
+            
+            if (!respuesta.ok) {
+                setMensajeAdvertencia(datos.error || "Error al reiniciar el sistema");
+                return;
+            }
+
+            
             setHistorial([]);
             setEstabilizado(false);
             setTemperatura("");
-            setMensajeAdvertencia("Sistema reiniciado. ¡Nueva temperatura generada!");
+            setMensajeAdvertencia(datos.mensaje || "Sistema reiniciado. ¡Nueva temperatura generada!");
 
         } catch (error) {
             setMensajeAdvertencia("Error de conexión al intentar reiniciar el sistema.");
@@ -89,9 +94,12 @@ const ReactorPage = () => {
                         ☢️ Estabiliza el Reactor ☢️
                     </CardTitle>
 
-                    {/* Mostrar mensaje de advertencia o victoria */}
+
                     {mensajeAdvertencia && (
-                        <Alert color={estabilizado ? "success" : "danger"} className="text-center">
+                        <Alert
+                            color={estabilizado ? "success" : (mensajeAdvertencia.includes("reiniciado") ? "info" : "danger")}
+                            className="text-center"
+                        >
                             {mensajeAdvertencia}
                         </Alert>
                     )}
@@ -122,7 +130,7 @@ const ReactorPage = () => {
 
                     <h5>Registro de Temperaturas Fallidas:</h5>
                     {historial.length === 0 ? (
-                        <p className="text-muted">No hay intentos fallidos aún. ¡Sigue intentando!</p>
+                        <p className="text-muted">Ningun intento fallido. ¡Intentalo!</p>
                     ) : (
                         <ListGroup>
                             {historial.map((temp, index) => (
@@ -134,8 +142,7 @@ const ReactorPage = () => {
                         </ListGroup>
                     )}
 
-                    {/* --- BOTÓN DE REINICIO --- */}
-                    {/* Solo se muestra si el jugador ya ganó (estabilizó el reactor) */}
+                    {/* BOTÓN DE REINICIO*/}
                     {estabilizado && (
                         <Button
                             color="primary"
@@ -144,7 +151,7 @@ const ReactorPage = () => {
                             onClick={reiniciarSistema}
                             disabled={cargando}
                         >
-                            {cargando ? <Spinner size="sm" /> : "🔄 Jugar de Nuevo (Reiniciar)"}
+                            {cargando ? <Spinner size="sm" /> : "🔄 (Reiniciar)"}
                         </Button>
                     )}
 
