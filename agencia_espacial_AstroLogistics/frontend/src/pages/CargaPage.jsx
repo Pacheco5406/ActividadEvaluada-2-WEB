@@ -5,7 +5,6 @@ import {
 } from 'reactstrap';
 
 const CargaPage = () => {
-    // --- ESTADOS DEL SISTEMA ---
     const [inventario, setInventario] = useState([]);
     const [cargaActual, setCargaActual] = useState([]);
     const [creditos, setCreditos] = useState(0.00);
@@ -38,7 +37,7 @@ const CargaPage = () => {
             setCargaActual(dataCarga.itemsCargados || []);
             setCreditos(dataCarga.creditos);
             setCostoTotal(dataCarga.total);
-            
+
             if (dataTiempo) {
                 setTiempoRestante(Math.floor(dataTiempo.tiempoRestanteMs / 1000));
                 if (dataTiempo.confirmada || dataTiempo.sesionExpirada) {
@@ -150,10 +149,10 @@ const CargaPage = () => {
         try {
             const respuesta = await fetch(`${baseUrl}/api/carga/confirmar`, { method: 'POST' });
             const data = await respuesta.json();
-            
+
             setJuegoTerminado(true);
             setSesionActiva(false);
-            
+
             if (data.gano) {
                 setMensajeVictoria(data.mensaje);
             } else {
@@ -204,6 +203,9 @@ const CargaPage = () => {
                     <div className="mb-2 mb-md-0">
                         <h4 className="mb-0 fw-bold">🚀 AstroLogistics Ltd.</h4>
                         <small className="text-muted">Panel del Capitán - Ventana de Lanzamiento</small>
+                        <div className="mt-1 small text-danger fw-bold">
+                            ⚠️ Regla: Debes gastar mínimo el 70% de los créditos (sin llegar a 0).
+                        </div>
                     </div>
 
                     <div className="d-flex gap-2 align-items-center flex-wrap">
@@ -226,7 +228,7 @@ const CargaPage = () => {
                         ⚠️ {mensajeError}
                     </Alert>
                 )}
-                
+
                 {mensajeVictoria && (
                     <Alert color="success" className="text-center fw-bold fs-5 shadow-sm">
                         🎉 {mensajeVictoria}
