@@ -38,7 +38,7 @@ const getCarga = (req, res) => {
 //se verifica si el stock es menor a la solicitada 400 stock insuficiente
 const postCargaTemporal = (req, res) => {
   if (acaboTiempo()) {
-    return res.status(401).json({ sesionExpirada: true, error: "Se acabo el tiempo, puedes inciar una nueva sesión" });
+    return res.status(401).json({ sesionExpirada: true, error: "Se acabo el tiempo, debes inciar una nueva sesión" });
   }
   if (partida.confirmada) {
     return res.status(400).json(mensajeConfirmada);
@@ -178,7 +178,7 @@ const postConfirmarCarga = (req, res) => {
   const resultado = evaluarVictoria(partida);
   partida.confirmada = true;
   if (resultado.gano) {
-    return res.status(200).json({ gano: true, mensaje: "¡Felicidades has ganado!" });
+    return res.status(200).json({ gano: true, mensaje: "¡Lanzamiento Exitoso!" });
   }
   //El ? actua como un if abreviado 
   const motivo = resultado.creditosRestantes <= 0

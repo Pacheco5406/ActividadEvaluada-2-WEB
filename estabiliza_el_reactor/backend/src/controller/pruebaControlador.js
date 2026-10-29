@@ -66,7 +66,7 @@ const compararTemperatura = (req, res) => {
 const reiniciarSistema = (req, res) => {
     const nuevaTemperatura = temperatura.rebootServerNumero();
     return res.json({
-        mensaje: "Servidor reinciiado exitosamente",
+        mensaje: "Sistema reiniciado. ¡Nueva temperatura generada!",
         nuevaTemperaturaGeneradaReinicio: nuevaTemperatura
     });
 };
